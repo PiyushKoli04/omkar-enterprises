@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shipping Rates — SwiftShip</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈</text></svg>">
+</head>
+<body>
+
+<div id="navbar-slot"></div>
+
+<!-- Page Header -->
+<div style="background:var(--c-surface);border-bottom:1px solid var(--c-border);padding:48px 0">
+  <div class="container">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+      <span class="badge badge-primary">Live Rates</span>
+    </div>
+    <h1 style="font-size:clamp(1.8rem,4vw,3rem);margin-bottom:10px">Compare Shipping Rates</h1>
+    <p>Find the best international courier rates for your shipment. Filter by courier, origin, and destination.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+
+    <!-- Filters -->
+    <div class="rate-filter">
+      <h3 style="margin-bottom:18px">🔍 Filter Rates</h3>
+      <div class="rate-filter-grid">
+        <div class="form-group">
+          <label class="form-label">Courier</label>
+          <select class="form-control" id="filter-courier">
+            <option value="">All Couriers</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">From Country</label>
+          <select class="form-control" id="filter-from">
+            <option value="">All Origins</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">To Country</label>
+          <select class="form-control" id="filter-to">
+            <option value="">All Destinations</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="filter-btn">Apply Filters</button>
+        <button class="btn btn-secondary" id="reset-btn">Reset</button>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="rates-loading" class="flex-center" style="padding:60px">
+      <div class="spinner"></div>
+    </div>
+    <div id="rates-results" class="hidden"></div>
+    <div id="rates-empty" class="hidden">
+      <div class="empty-state">
+        <div class="empty-icon">💸</div>
+        <h3>No rates found</h3>
+        <p>Try adjusting your filters or check back later.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div id="footer-slot"></div>
+
+<script type="module">
+  import { initAuth } from './js/auth.js';
+  import { injectNavbar, injectFooter, injectAuthModal, setupAuthModal, setupNavbarAuth } from './js/components.js';
+  import { getRates, getCouriers } from './js/firestore.js';
+  import { setActiveNav } from './js/ui.js';
+
+  injectNavbar(); injectFooter(); injectAuthModal();
+  setupNavbarAuth(); setupAuthModal(); initAuth(); setActiveNav();
+
+  let allRates = [];
+
+  async function loadFilters() {
+    const couriers = await getCouriers(true);
+    const courierSel = document.getElementById('filter-courier');
+    couriers.forEach(c => {
+      courierSel.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+    });
+  }
+
+  function populateCountryDropdowns(rates) {
+    const froms = [...new Set(rates.map(r => r.from_country))].sort();
+    const tos   = [...new Set(rates.map(r => r.to_country))].sort();
+    const fromSel = document.getElementById('filter-from');
+    const toSel   = document.getElementById('filter-to');
+    fromSel.innerHTML = '<option value="">All Origins</option>';
+    toSel.innerHTML   = '<option value="">All Destinations</option>';
+    froms.forEach(c => fromSel.innerHTML += `<option value="${c}">${c}</option>`);
+    tos.forEach(c   => toSel.innerHTML   += `<option value="${c}">${c}</option>`);
+  }
+
+  function renderRates(rates) {
+    const loading = document.getElementById('rates-loading');
+    const results = document.getElementById('rates-results');
+    const empty   = document.getElementById('rates-empty');
+
+    loading.classList.add('hidden');
+
+    if (!rates.length) {
+      results.classList.add('hidden');
+      empty.classList.remove('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    results.classList.remove('hidden');
+
+    results.innerHTML = rates.map(r => `
+      <div class="rate-result mb-3">
+        <div class="rate-result-header">
+          <div>
+            <h3 style="font-size:1rem;margin-bottom:4px">${r.courier_name}</h3>
+            <p style="font-size:0.85rem">
+              <span style="color:var(--c-text)">📍 ${r.from_country}</span>
+              <span style="color:var(--c-text-3);margin:0 8px">→</span>
+              <span style="color:var(--c-text)">📍 ${r.to_country}</span>
+            </p>
+          </div>
+          <span class="badge badge-success">Live Rate</span>
+        </div>
+        <div class="table-wrap">
+          <table class="rate-table">
+            <thead>
+              <tr>
+                <th>Weight Slab</th>
+                <th>Price</th>
+                <th>Est. Delivery</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${r.weight_slabs.map(slab => `
+                <tr>
+                  <td>${slab}</td>
+                  <td>${r.prices?.[slab] || '—'}</td>
+                  <td style="color:var(--c-text-3)">3–7 business days</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function applyFilters() {
+    const courier = document.getElementById('filter-courier').value;
+    const from    = document.getElementById('filter-from').value;
+    const to      = document.getElementById('filter-to').value;
+
+    document.getElementById('rates-loading').classList.remove('hidden');
+    document.getElementById('rates-results').classList.add('hidden');
+    document.getElementById('rates-empty').classList.add('hidden');
+
+    try {
+      const filters = {};
+      if (courier) filters.courier_name = courier;
+      if (from)    filters.from_country = from;
+      if (to)      filters.to_country   = to;
+      const rates = await getRates(filters);
+      renderRates(rates);
+    } catch(e) {
+      document.getElementById('rates-loading').classList.add('hidden');
+      document.getElementById('rates-results').innerHTML = `<div class="alert alert-danger">Failed to load rates. Please try again.</div>`;
+      document.getElementById('rates-results').classList.remove('hidden');
+    }
+  }
+
+  // Init
+  async function init() {
+    await loadFilters();
+    try {
+      allRates = await getRates();
+      populateCountryDropdowns(allRates);
+      renderRates(allRates);
+    } catch(e) {
+      document.getElementById('rates-loading').classList.add('hidden');
+    }
+  }
+
+  document.getElementById('filter-btn').addEventListener('click', applyFilters);
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    document.getElementById('filter-courier').value = '';
+    document.getElementById('filter-from').value = '';
+    document.getElementById('filter-to').value = '';
+    renderRates(allRates);
+  });
+
+  init();
+</script>
+</body>
+</html>

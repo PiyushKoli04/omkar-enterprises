@@ -1,0 +1,60 @@
+// ============================================================
+// FIRESTORE SECURITY RULES — SwiftShip
+// Copy these rules into Firebase Console:
+// Firestore Database → Rules
+// ============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper: Admin check ──────────────────────────────
+    function isAdmin() {
+      return request.auth != null &&
+             request.auth.uid == "YOUR_ADMIN_UID_HERE"; // ← replace with real UID
+    }
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // ── Couriers ─────────────────────────────────────────
+    // Public: read active couriers
+    // Admin only: full write access
+    match /couriers/{courierId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ── Rates ─────────────────────────────────────────────
+    // Public: read all rates
+    // Admin only: full write access
+    match /rates/{rateId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ── Inquiries ──────────────────────────────────────────
+    // Public: create (submit inquiries)
+    // Admin: read all and update status
+    // Authenticated: can read their own inquiries
+    match /inquiries/{inquiryId} {
+      allow create: if true;
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Users ──────────────────────────────────────────────
+    // Authenticated users: can read/write their own document
+    // Admin: full access
+    match /users/{userId} {
+      allow read, write: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
+    }
+
+    // ── Default: deny all other access ───────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

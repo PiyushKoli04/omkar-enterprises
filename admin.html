@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — SwiftShip</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙</text></svg>">
+</head>
+<body>
+
+<!-- Access Denied Screen -->
+<div id="access-denied" class="hidden" style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:24px">
+  <div style="font-size:4rem">🔒</div>
+  <h2>Access Denied</h2>
+  <p>This panel is restricted to administrators only.</p>
+  <a href="../index.html" class="btn btn-primary">← Back to Home</a>
+</div>
+
+<!-- Loading Screen -->
+<div id="auth-loading" style="min-height:100vh;display:flex;align-items:center;justify-content:center">
+  <div class="spinner"></div>
+</div>
+
+<!-- Admin App -->
+<div id="admin-app" class="hidden">
+  <div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-logo">
+        <div class="logo-icon">✈</div>
+        Swift<span style="color:var(--c-primary)">Ship</span>
+        <span class="badge badge-danger" style="margin-left:auto;font-size:0.65rem">Admin</span>
+      </div>
+      <nav class="admin-nav">
+        <div class="admin-nav-section">
+          <div class="admin-nav-label">Overview</div>
+          <a href="#" class="admin-nav-link active" data-page="dashboard">
+            <span class="icon">📊</span> Dashboard
+          </a>
+        </div>
+        <div class="admin-nav-section">
+          <div class="admin-nav-label">Management</div>
+          <a href="#" class="admin-nav-link" data-page="couriers">
+            <span class="icon">🚚</span> Couriers
+          </a>
+          <a href="#" class="admin-nav-link" data-page="rates">
+            <span class="icon">💰</span> Rates
+          </a>
+          <a href="#" class="admin-nav-link" data-page="inquiries">
+            <span class="icon">📬</span> Inquiries
+          </a>
+        </div>
+        <div class="admin-nav-section">
+          <div class="admin-nav-label">System</div>
+          <a href="#" class="admin-nav-link" data-page="seed">
+            <span class="icon">🌱</span> Seed Data
+          </a>
+          <a href="../index.html" class="admin-nav-link">
+            <span class="icon">🏠</span> View Site
+          </a>
+        </div>
+      </nav>
+      <div style="padding:16px 20px;border-top:1px solid var(--c-border)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div class="user-avatar" id="sidebar-avatar">A</div>
+          <div style="font-size:0.8rem;overflow:hidden">
+            <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="sidebar-name">Admin</div>
+            <div style="color:var(--c-text-3)" id="sidebar-email"></div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm btn-full" id="admin-logout">Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h3 id="page-title" style="font-size:1rem;margin-bottom:2px">Dashboard</h3>
+          <p id="page-subtitle" style="font-size:0.8rem;color:var(--c-text-3)">Overview of your platform</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:0.8rem;color:var(--c-text-3)" id="admin-date"></span>
+        </div>
+      </div>
+
+      <div class="admin-content">
+
+        <!-- ── DASHBOARD ───────────────────────────────── -->
+        <div class="admin-page active" id="page-dashboard">
+          <div class="admin-stats" id="dash-stats">
+            <div class="admin-stat-card">
+              <div class="stat-icon">🚚</div>
+              <div class="stat-val" id="stat-couriers">—</div>
+              <div class="stat-name">Total Couriers</div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="stat-icon">💰</div>
+              <div class="stat-val" id="stat-rates">—</div>
+              <div class="stat-name">Rate Entries</div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="stat-icon">📬</div>
+              <div class="stat-val" id="stat-inquiries">—</div>
+              <div class="stat-name">Total Inquiries</div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="stat-icon">🆕</div>
+              <div class="stat-val" id="stat-new">—</div>
+              <div class="stat-name">New Inquiries</div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <h3 style="margin-bottom:16px;font-size:1rem">Quick Actions</h3>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <button class="btn btn-outline btn-sm" onclick="switchPage('couriers');document.getElementById('courier-add-btn').click()">+ Add New Courier</button>
+                <button class="btn btn-outline btn-sm" onclick="switchPage('rates');document.getElementById('rate-add-btn').click()">+ Add Rate Entry</button>
+                <button class="btn btn-secondary btn-sm" onclick="switchPage('inquiries')">View Inquiries</button>
+              </div>
+            </div>
+            <div class="card">
+              <h3 style="margin-bottom:16px;font-size:1rem">System Status</h3>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-size:0.85rem;color:var(--c-text-2)">Firebase Connection</span>
+                  <span class="badge badge-success">● Online</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-size:0.85rem;color:var(--c-text-2)">Authentication</span>
+                  <span class="badge badge-success">● Active</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-size:0.85rem;color:var(--c-text-2)">Firestore</span>
+                  <span class="badge badge-success">● Operational</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── COURIERS ────────────────────────────────── -->
+        <div class="admin-page" id="page-couriers">
+          <div class="admin-page-header">
+            <div>
+              <h2>Courier Management</h2>
+              <p>Add, edit, and manage courier partners and their tracking URLs</p>
+            </div>
+            <button class="btn btn-primary" id="courier-add-btn">+ Add Courier</button>
+          </div>
+          <div id="couriers-loading" class="flex-center" style="padding:40px"><div class="spinner"></div></div>
+          <div id="couriers-table-wrap" class="hidden">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Courier Name</th>
+                    <th>Tracking URL</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="couriers-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="couriers-empty" class="hidden">
+            <div class="empty-state"><div class="empty-icon">🚚</div><h3>No couriers yet</h3><p>Add your first courier to get started.</p></div>
+          </div>
+        </div>
+
+        <!-- ── RATES ───────────────────────────────────── -->
+        <div class="admin-page" id="page-rates">
+          <div class="admin-page-header">
+            <div>
+              <h2>Rate Management</h2>
+              <p>Create and manage shipping rate tables by courier, origin, and destination</p>
+            </div>
+            <button class="btn btn-primary" id="rate-add-btn">+ Add Rate</button>
+          </div>
+          <div id="rates-loading-admin" class="flex-center" style="padding:40px"><div class="spinner"></div></div>
+          <div id="rates-table-wrap" class="hidden">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Courier</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Weight Slabs</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="rates-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="rates-empty-admin" class="hidden">
+            <div class="empty-state"><div class="empty-icon">💰</div><h3>No rate entries yet</h3><p>Add rate tables to show pricing to users.</p></div>
+          </div>
+        </div>
+
+        <!-- ── INQUIRIES ───────────────────────────────── -->
+        <div class="admin-page" id="page-inquiries">
+          <div class="admin-page-header">
+            <div>
+              <h2>Inquiry Management</h2>
+              <p>View and manage customer inquiries</p>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-secondary btn-sm filter-inq-btn active" data-status="">All</button>
+              <button class="btn btn-secondary btn-sm filter-inq-btn" data-status="new">New</button>
+              <button class="btn btn-secondary btn-sm filter-inq-btn" data-status="in_progress">In Progress</button>
+              <button class="btn btn-secondary btn-sm filter-inq-btn" data-status="resolved">Resolved</button>
+            </div>
+          </div>
+          <div id="inq-loading" class="flex-center" style="padding:40px"><div class="spinner"></div></div>
+          <div id="inq-table-wrap" class="hidden">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="inq-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="inq-empty" class="hidden">
+            <div class="empty-state"><div class="empty-icon">📬</div><h3>No inquiries found</h3><p>Inquiries submitted via the Contact page will appear here.</p></div>
+          </div>
+        </div>
+
+        <!-- ── SEED DATA ───────────────────────────────── -->
+        <div class="admin-page" id="page-seed">
+          <div class="admin-page-header">
+            <div>
+              <h2>Seed Sample Data</h2>
+              <p>Populate Firestore with sample couriers and rates for testing</p>
+            </div>
+          </div>
+          <div class="card" style="max-width:600px">
+            <h3 style="margin-bottom:12px">⚠️ Important</h3>
+            <p style="margin-bottom:16px">This will add sample couriers (DHL, FedEx, UPS, Aramex, Blue Dart) and sample rate entries to your Firestore. Run this only once on a fresh database.</p>
+            <div id="seed-alert"></div>
+            <button class="btn btn-primary" id="seed-btn">🌱 Run Seed Data</button>
+          </div>
+        </div>
+
+      </div><!-- /admin-content -->
+    </main>
+  </div><!-- /admin-layout -->
+</div><!-- /admin-app -->
+
+<!-- Courier Drawer -->
+<div class="drawer-overlay" id="courier-drawer-overlay">
+  <div class="drawer">
+    <div class="drawer-header">
+      <h3 id="courier-drawer-title">Add Courier</h3>
+      <button class="btn btn-secondary btn-icon modal-close" id="courier-drawer-close">✕</button>
+    </div>
+    <div class="drawer-body">
+      <input type="hidden" id="edit-courier-id">
+      <div class="form-group">
+        <label class="form-label">Courier Name *</label>
+        <input type="text" class="form-control" id="courier-name" placeholder="e.g. DHL Express">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Logo / Emoji</label>
+        <input type="text" class="form-control" id="courier-logo" placeholder="e.g. 🟡" maxlength="4">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tracking URL *</label>
+        <input type="text" class="form-control" id="courier-url" placeholder="https://track.example.com?id={tracking_id}">
+        <p class="text-sm text-muted mt-1">Use <code style="color:var(--c-primary)">{tracking_id}</code> as placeholder in the URL</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-control" id="courier-status">
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn-primary" id="courier-save-btn">Save Courier</button>
+      <button class="btn btn-secondary" id="courier-cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Rate Drawer -->
+<div class="drawer-overlay" id="rate-drawer-overlay">
+  <div class="drawer">
+    <div class="drawer-header">
+      <h3 id="rate-drawer-title">Add Rate Entry</h3>
+      <button class="btn btn-secondary btn-icon" id="rate-drawer-close">✕</button>
+    </div>
+    <div class="drawer-body">
+      <input type="hidden" id="edit-rate-id">
+      <div class="form-group">
+        <label class="form-label">Courier Name *</label>
+        <input type="text" class="form-control" id="rate-courier" placeholder="e.g. DHL Express">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">From Country *</label>
+          <input type="text" class="form-control" id="rate-from" placeholder="e.g. India">
+        </div>
+        <div class="form-group">
+          <label class="form-label">To Country *</label>
+          <input type="text" class="form-control" id="rate-to" placeholder="e.g. USA">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Weight Slabs & Prices *</label>
+        <p class="text-sm text-muted" style="margin-bottom:10px">Add each weight slab and its corresponding price</p>
+        <div id="slabs-container" style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px"></div>
+        <button type="button" class="add-slab-btn" id="add-slab-btn">+ Add Weight Slab</button>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn-primary" id="rate-save-btn">Save Rate</button>
+      <button class="btn btn-secondary" id="rate-cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Inquiry Detail Modal -->
+<div class="modal-overlay" id="inq-detail-modal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <h3>Inquiry Details</h3>
+      <button class="btn btn-secondary btn-icon" id="inq-modal-close">✕</button>
+    </div>
+    <div id="inq-detail-body" style="display:flex;flex-direction:column;gap:14px"></div>
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--c-border)">
+      <label class="form-label">Update Status</label>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button class="btn btn-sm" style="background:var(--c-accent-dim);color:var(--c-accent)" onclick="updateInqStatus('new')">New</button>
+        <button class="btn btn-sm" style="background:rgba(234,179,8,0.15);color:var(--c-warning)" onclick="updateInqStatus('in_progress')">In Progress</button>
+        <button class="btn btn-sm" style="background:rgba(34,197,94,0.15);color:var(--c-success)" onclick="updateInqStatus('resolved')">Resolved</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initAuth, getCurrentUser, isAdmin, onUserChange, logout } from '../js/auth.js';
+  import {
+    getCouriers, addCourier, updateCourier, deleteCourier, toggleCourierStatus,
+    getRates, addRate, updateRate, deleteRate,
+    getInquiries, updateInquiryStatus,
+    seedSampleData
+  } from '../js/firestore.js';
+  import { showToast, showConfirm, statusBadge, formatDate, validateFields, setBtnLoading, createEmptyState } from '../js/ui.js';
+
+  // ── Auth Guard ──────────────────────────────────────────
+  initAuth();
+  onUserChange(user => {
+    document.getElementById('auth-loading').style.display = 'none';
+    if (user && isAdmin()) {
+      document.getElementById('admin-app').classList.remove('hidden');
+      document.getElementById('access-denied').classList.add('hidden');
+      // Set user info in sidebar
+      document.getElementById('sidebar-avatar').textContent = (user.displayName || user.email || 'A').charAt(0).toUpperCase();
+      document.getElementById('sidebar-name').textContent   = user.displayName || 'Admin';
+      document.getElementById('sidebar-email').textContent  = user.email || '';
+      loadDashboard();
+    } else if (user && !isAdmin()) {
+      document.getElementById('access-denied').classList.remove('hidden');
+    } else {
+      window.location.href = '../index.html';
+    }
+  });
+
+  document.getElementById('admin-logout').addEventListener('click', () => logout().then(() => window.location.href = '../index.html'));
+  document.getElementById('admin-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  // ── Page Navigation ─────────────────────────────────────
+  const PAGE_META = {
+    dashboard: { title: 'Dashboard',    subtitle: 'Platform overview and quick actions' },
+    couriers:  { title: 'Couriers',     subtitle: 'Manage partner couriers and tracking URLs' },
+    rates:     { title: 'Rates',        subtitle: 'Manage shipping rate tables' },
+    inquiries: { title: 'Inquiries',    subtitle: 'View and respond to customer inquiries' },
+    seed:      { title: 'Seed Data',    subtitle: 'Populate sample data for testing' },
+  };
+
+  window.switchPage = function(page) {
+    document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
+    document.getElementById(`page-${page}`)?.classList.add('active');
+    document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
+    const meta = PAGE_META[page] || {};
+    document.getElementById('page-title').textContent    = meta.title    || page;
+    document.getElementById('page-subtitle').textContent = meta.subtitle || '';
+    if (page === 'couriers')  loadCouriers();
+    if (page === 'rates')     loadRates();
+    if (page === 'inquiries') loadInquiries();
+  };
+
+  document.querySelectorAll('.admin-nav-link[data-page]').forEach(link => {
+    link.addEventListener('click', e => { e.preventDefault(); switchPage(link.dataset.page); });
+  });
+
+  // ── Dashboard ───────────────────────────────────────────
+  async function loadDashboard() {
+    try {
+      const [couriers, rates, inquiries] = await Promise.all([
+        getCouriers(), getRates(), getInquiries()
+      ]);
+      document.getElementById('stat-couriers').textContent  = couriers.length;
+      document.getElementById('stat-rates').textContent     = rates.length;
+      document.getElementById('stat-inquiries').textContent = inquiries.length;
+      document.getElementById('stat-new').textContent       = inquiries.filter(i => i.status === 'new').length;
+    } catch(e) { /* silent */ }
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // COURIERS
+  // ═══════════════════════════════════════════════════════
+  let couriersList = [];
+
+  async function loadCouriers() {
+    const loading = document.getElementById('couriers-loading');
+    const wrap    = document.getElementById('couriers-table-wrap');
+    const empty   = document.getElementById('couriers-empty');
+    loading.classList.remove('hidden'); wrap.classList.add('hidden'); empty.classList.add('hidden');
+    try {
+      couriersList = await getCouriers();
+      loading.classList.add('hidden');
+      if (!couriersList.length) { empty.classList.remove('hidden'); return; }
+      wrap.classList.remove('hidden');
+      renderCouriersTable(couriersList);
+    } catch(e) { loading.classList.add('hidden'); showToast('Failed to load couriers.', 'error'); }
+  }
+
+  function renderCouriersTable(list) {
+    document.getElementById('couriers-tbody').innerHTML = list.map(c => `
+      <tr>
+        <td><div style="display:flex;align-items:center;gap:8px"><span>${c.logo || '📦'}</span><span style="font-weight:500;color:var(--c-text)">${c.name}</span></div></td>
+        <td><code style="font-size:0.75rem;color:var(--c-text-3);word-break:break-all">${c.tracking_url || '—'}</code></td>
+        <td>${statusBadge(c.is_active ? 'active' : 'inactive')}</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-secondary btn-sm" onclick="editCourier('${c.id}')">Edit</button>
+            <button class="btn btn-secondary btn-sm" onclick="toggleCourier('${c.id}', ${c.is_active})">${c.is_active ? 'Deactivate' : 'Activate'}</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteCourierRow('${c.id}')">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Open drawer
+  document.getElementById('courier-add-btn').addEventListener('click', () => {
+    document.getElementById('courier-drawer-title').textContent = 'Add Courier';
+    document.getElementById('edit-courier-id').value = '';
+    document.getElementById('courier-name').value  = '';
+    document.getElementById('courier-logo').value  = '';
+    document.getElementById('courier-url').value   = '';
+    document.getElementById('courier-status').value= 'true';
+    openCourierDrawer();
+  });
+
+  window.editCourier = function(id) {
+    const c = couriersList.find(x => x.id === id);
+    if (!c) return;
+    document.getElementById('courier-drawer-title').textContent = 'Edit Courier';
+    document.getElementById('edit-courier-id').value = c.id;
+    document.getElementById('courier-name').value    = c.name || '';
+    document.getElementById('courier-logo').value    = c.logo || '';
+    document.getElementById('courier-url').value     = c.tracking_url || '';
+    document.getElementById('courier-status').value  = String(c.is_active);
+    openCourierDrawer();
+  };
+
+  window.toggleCourier = async function(id, cur) {
+    try { await toggleCourierStatus(id, cur); showToast('Status updated.', 'success'); loadCouriers(); }
+    catch(e) { showToast('Failed to update status.', 'error'); }
+  };
+
+  window.deleteCourierRow = async function(id) {
+    const ok = await showConfirm('Delete this courier? This cannot be undone.');
+    if (!ok) return;
+    try { await deleteCourier(id); showToast('Courier deleted.', 'success'); loadCouriers(); }
+    catch(e) { showToast('Failed to delete.', 'error'); }
+  };
+
+  document.getElementById('courier-save-btn').addEventListener('click', async () => {
+    const btn  = document.getElementById('courier-save-btn');
+    const id   = document.getElementById('edit-courier-id').value;
+    const name = document.getElementById('courier-name').value.trim();
+    const logo = document.getElementById('courier-logo').value.trim();
+    const url  = document.getElementById('courier-url').value.trim();
+    const active = document.getElementById('courier-status').value === 'true';
+
+    if (!validateFields([
+      { value: name, message: 'Courier name is required.' },
+      { value: url,  message: 'Tracking URL is required.' }
+    ])) return;
+
+    setBtnLoading(btn, true);
+    try {
+      const data = { name, logo, tracking_url: url, is_active: active };
+      if (id) await updateCourier(id, data); else await addCourier(data);
+      showToast(id ? 'Courier updated.' : 'Courier added.', 'success');
+      closeCourierDrawer(); loadCouriers();
+    } catch(e) { showToast('Failed to save courier.', 'error'); }
+    finally { setBtnLoading(btn, false, 'Save Courier'); }
+  });
+
+  function openCourierDrawer()  { document.getElementById('courier-drawer-overlay').classList.add('open'); }
+  function closeCourierDrawer() { document.getElementById('courier-drawer-overlay').classList.remove('open'); }
+  document.getElementById('courier-drawer-close').addEventListener('click', closeCourierDrawer);
+  document.getElementById('courier-cancel-btn').addEventListener('click', closeCourierDrawer);
+
+  // ═══════════════════════════════════════════════════════
+  // RATES
+  // ═══════════════════════════════════════════════════════
+  let ratesList = [];
+  let slabCount = 0;
+
+  async function loadRates() {
+    const loading = document.getElementById('rates-loading-admin');
+    const wrap    = document.getElementById('rates-table-wrap');
+    const empty   = document.getElementById('rates-empty-admin');
+    loading.classList.remove('hidden'); wrap.classList.add('hidden'); empty.classList.add('hidden');
+    try {
+      ratesList = await getRates();
+      loading.classList.add('hidden');
+      if (!ratesList.length) { empty.classList.remove('hidden'); return; }
+      wrap.classList.remove('hidden');
+      renderRatesTable(ratesList);
+    } catch(e) { loading.classList.add('hidden'); showToast('Failed to load rates.', 'error'); }
+  }
+
+  function renderRatesTable(list) {
+    document.getElementById('rates-tbody').innerHTML = list.map(r => `
+      <tr>
+        <td style="font-weight:500;color:var(--c-text)">${r.courier_name}</td>
+        <td>${r.from_country}</td>
+        <td>${r.to_country}</td>
+        <td>${(r.weight_slabs || []).join(', ')}</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-secondary btn-sm" onclick="editRate('${r.id}')">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteRateRow('${r.id}')">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function addSlabRow(slab = '', price = '') {
+    slabCount++;
+    const id = slabCount;
+    const container = document.getElementById('slabs-container');
+    const row = document.createElement('div');
+    row.className = 'slab-row'; row.id = `slab-row-${id}`;
+    row.innerHTML = `
+      <input type="text" class="form-control slab-name" placeholder="e.g. 0–0.5 kg" value="${slab}">
+      <input type="text" class="form-control slab-price" placeholder="e.g. ₹1,800" value="${price}">
+      <button type="button" class="btn btn-danger btn-icon" onclick="document.getElementById('slab-row-${id}').remove()">✕</button>
+    `;
+    container.appendChild(row);
+  }
+
+  document.getElementById('add-slab-btn').addEventListener('click', () => addSlabRow());
+
+  function getSlabData() {
+    const rows = document.querySelectorAll('.slab-row');
+    const slabs = [], prices = {};
+    rows.forEach(row => {
+      const s = row.querySelector('.slab-name').value.trim();
+      const p = row.querySelector('.slab-price').value.trim();
+      if (s) { slabs.push(s); if (p) prices[s] = p; }
+    });
+    return { slabs, prices };
+  }
+
+  function openRateDrawer(editing = false) {
+    document.getElementById('rate-drawer-title').textContent = editing ? 'Edit Rate Entry' : 'Add Rate Entry';
+    document.getElementById('rate-drawer-overlay').classList.add('open');
+  }
+  function closeRateDrawer() { document.getElementById('rate-drawer-overlay').classList.remove('open'); }
+
+  document.getElementById('rate-add-btn').addEventListener('click', () => {
+    document.getElementById('edit-rate-id').value = '';
+    document.getElementById('rate-courier').value = '';
+    document.getElementById('rate-from').value    = '';
+    document.getElementById('rate-to').value      = '';
+    document.getElementById('slabs-container').innerHTML = '';
+    slabCount = 0;
+    addSlabRow(); addSlabRow();
+    openRateDrawer(false);
+  });
+
+  window.editRate = function(id) {
+    const r = ratesList.find(x => x.id === id);
+    if (!r) return;
+    document.getElementById('edit-rate-id').value = r.id;
+    document.getElementById('rate-courier').value = r.courier_name || '';
+    document.getElementById('rate-from').value    = r.from_country || '';
+    document.getElementById('rate-to').value      = r.to_country   || '';
+    document.getElementById('slabs-container').innerHTML = '';
+    slabCount = 0;
+    (r.weight_slabs || []).forEach(s => addSlabRow(s, r.prices?.[s] || ''));
+    if (!(r.weight_slabs || []).length) { addSlabRow(); addSlabRow(); }
+    openRateDrawer(true);
+  };
+
+  window.deleteRateRow = async function(id) {
+    const ok = await showConfirm('Delete this rate entry?');
+    if (!ok) return;
+    try { await deleteRate(id); showToast('Rate deleted.', 'success'); loadRates(); }
+    catch(e) { showToast('Failed to delete.', 'error'); }
+  };
+
+  document.getElementById('rate-save-btn').addEventListener('click', async () => {
+    const btn     = document.getElementById('rate-save-btn');
+    const id      = document.getElementById('edit-rate-id').value;
+    const courier = document.getElementById('rate-courier').value.trim();
+    const from    = document.getElementById('rate-from').value.trim();
+    const to      = document.getElementById('rate-to').value.trim();
+    const { slabs, prices } = getSlabData();
+
+    if (!validateFields([
+      { value: courier, message: 'Courier name is required.' },
+      { value: from,    message: 'From country is required.' },
+      { value: to,      message: 'To country is required.'   }
+    ])) return;
+    if (!slabs.length) { showToast('Add at least one weight slab.', 'error'); return; }
+
+    setBtnLoading(btn, true);
+    try {
+      const data = { courier_name: courier, from_country: from, to_country: to, weight_slabs: slabs, prices };
+      if (id) await updateRate(id, data); else await addRate(data);
+      showToast(id ? 'Rate updated.' : 'Rate added.', 'success');
+      closeRateDrawer(); loadRates();
+    } catch(e) { showToast('Failed to save rate.', 'error'); }
+    finally { setBtnLoading(btn, false, 'Save Rate'); }
+  });
+
+  document.getElementById('rate-drawer-close').addEventListener('click', closeRateDrawer);
+  document.getElementById('rate-cancel-btn').addEventListener('click', closeRateDrawer);
+
+  // ═══════════════════════════════════════════════════════
+  // INQUIRIES
+  // ═══════════════════════════════════════════════════════
+  let inqList = [];
+  let currentInqId = null;
+
+  async function loadInquiries(statusFilter = null) {
+    const loading = document.getElementById('inq-loading');
+    const wrap    = document.getElementById('inq-table-wrap');
+    const empty   = document.getElementById('inq-empty');
+    loading.classList.remove('hidden'); wrap.classList.add('hidden'); empty.classList.add('hidden');
+    try {
+      inqList = await getInquiries(statusFilter || undefined);
+      loading.classList.add('hidden');
+      if (!inqList.length) { empty.classList.remove('hidden'); return; }
+      wrap.classList.remove('hidden');
+      renderInquiriesTable(inqList);
+    } catch(e) { loading.classList.add('hidden'); showToast('Failed to load inquiries.', 'error'); }
+  }
+
+  function renderInquiriesTable(list) {
+    document.getElementById('inq-tbody').innerHTML = list.map(i => `
+      <tr>
+        <td style="font-weight:500;color:var(--c-text)">${i.name || '—'}</td>
+        <td>${i.email || '—'}</td>
+        <td>${i.subject || 'General Inquiry'}</td>
+        <td>${statusBadge(i.status || 'new')}</td>
+        <td>${formatDate(i.createdAt)}</td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="openInquiry('${i.id}')">View</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  window.openInquiry = function(id) {
+    const inq = inqList.find(i => i.id === id);
+    if (!inq) return;
+    currentInqId = id;
+    document.getElementById('inq-detail-body').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><p class="text-sm text-muted">Name</p><p style="font-weight:500;color:var(--c-text)">${inq.name || '—'}</p></div>
+        <div><p class="text-sm text-muted">Email</p><p style="color:var(--c-text)">${inq.email || '—'}</p></div>
+        <div><p class="text-sm text-muted">Phone</p><p style="color:var(--c-text)">${inq.phone || '—'}</p></div>
+        <div><p class="text-sm text-muted">Date</p><p style="color:var(--c-text)">${formatDate(inq.createdAt)}</p></div>
+      </div>
+      <div><p class="text-sm text-muted">Subject</p><p style="color:var(--c-text);font-weight:500">${inq.subject || '—'}</p></div>
+      <div>
+        <p class="text-sm text-muted">Message</p>
+        <p style="color:var(--c-text-2);background:var(--c-surface-3);border-radius:8px;padding:14px;margin-top:4px;font-size:0.9rem;line-height:1.7">${inq.message || '—'}</p>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div><p class="text-sm text-muted">Current Status</p></div>
+        ${statusBadge(inq.status || 'new')}
+      </div>
+    `;
+    document.getElementById('inq-detail-modal').classList.add('open');
+  };
+
+  window.updateInqStatus = async function(status) {
+    if (!currentInqId) return;
+    try {
+      await updateInquiryStatus(currentInqId, status);
+      showToast('Status updated.', 'success');
+      document.getElementById('inq-detail-modal').classList.remove('open');
+      loadInquiries();
+    } catch(e) { showToast('Failed to update status.', 'error'); }
+  };
+
+  document.getElementById('inq-modal-close').addEventListener('click', () => {
+    document.getElementById('inq-detail-modal').classList.remove('open');
+  });
+
+  document.querySelectorAll('.filter-inq-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-inq-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      loadInquiries(btn.dataset.status || null);
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // SEED DATA
+  // ═══════════════════════════════════════════════════════
+  document.getElementById('seed-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('seed-btn');
+    const alertBox = document.getElementById('seed-alert');
+    setBtnLoading(btn, true);
+    try {
+      await seedSampleData();
+      alertBox.innerHTML = `<div class="alert alert-success">✓ Sample data seeded successfully! Navigate to Couriers and Rates to verify.</div>`;
+      showToast('Sample data seeded!', 'success');
+    } catch(e) {
+      alertBox.innerHTML = `<div class="alert alert-danger">⚠ Failed to seed data: ${e.message}</div>`;
+    } finally {
+      setBtnLoading(btn, false, '🌱 Run Seed Data');
+    }
+  });
+</script>
+</body>
+</html>

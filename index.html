@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SwiftShip — International Courier Aggregator</title>
+  <meta name="description" content="Track shipments across DHL, FedEx, UPS, Aramex and more. Compare international courier rates instantly.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈</text></svg>">
+</head>
+<body>
+
+<!-- Navbar injected by JS -->
+<div id="navbar-slot"></div>
+
+<!-- ── HERO ──────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span>🌍</span> Trusted by 50,000+ shippers worldwide
+      </div>
+      <h1>Ship Smarter with<br><em>SwiftShip</em></h1>
+      <p>Track shipments, compare courier rates, and get instant quotes across DHL, FedEx, UPS, Aramex, and more — all in one place.</p>
+
+      <!-- Tracking Box -->
+      <div class="tracking-box">
+        <h3>📦 Track Your Shipment</h3>
+        <p>Enter your tracking number and select your courier</p>
+
+        <div id="tracking-alert"></div>
+
+        <div class="tracking-form">
+          <div class="form-group">
+            <label class="form-label">Tracking ID</label>
+            <input type="text" class="form-control" id="tracking-id-input"
+              placeholder="e.g. JD014600155650001396" style="height:48px">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Select Courier</label>
+            <select class="form-control" id="courier-select" style="height:48px">
+              <option value="">Loading couriers...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="opacity:0">Track</label>
+            <button class="btn btn-primary" id="track-btn" style="height:48px;padding:0 28px">
+              Track Now →
+            </button>
+          </div>
+        </div>
+        <p class="text-sm text-muted mt-2">
+          ℹ️ You'll be redirected to the courier's official tracking page
+        </p>
+      </div>
+
+      <div style="margin-top:28px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="rates.html" class="btn btn-outline">Compare Rates</a>
+        <a href="contact.html" class="btn btn-secondary">Get a Quote</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ──────────────────────────────────────────────── -->
+<div class="stats-strip">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-value">6+</div>
+        <div class="stat-label">Partner Couriers</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">190+</div>
+        <div class="stat-label">Countries Covered</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">50K+</div>
+        <div class="stat-label">Shipments Tracked</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">24/7</div>
+        <div class="stat-label">Support Available</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SERVICES ───────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="text-center mb-3">
+      <h2>Everything You Need</h2>
+      <p style="max-width:480px;margin:12px auto">From real-time tracking to competitive rate comparison — SwiftShip puts you in control of your shipments.</p>
+    </div>
+    <div class="grid-3" style="margin-top:40px">
+      <div class="service-card">
+        <div class="service-icon">📍</div>
+        <h3>Real-Time Tracking</h3>
+        <p>Track your parcels across all major international couriers in one click. No logins, no hassle.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">💰</div>
+        <h3>Rate Comparison</h3>
+        <p>Compare shipping rates by courier, origin, destination, and weight. Always find the best deal.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🌐</div>
+        <h3>Global Coverage</h3>
+        <p>Partnered with DHL, FedEx, UPS, Aramex, Blue Dart and more for worldwide delivery solutions.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">⚡</div>
+        <h3>Instant Quotes</h3>
+        <p>Get shipping quotes instantly without having to sign up or call anyone. Simple and transparent.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🔒</div>
+        <h3>Secure & Reliable</h3>
+        <p>Your data is secured with Firebase. We only redirect you to official courier tracking portals.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📬</div>
+        <h3>Expert Support</h3>
+        <p>Have questions? Our team is ready to assist with inquiries, customs, and shipping guidance.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── COURIERS STRIP ──────────────────────────────────────── -->
+<section class="section-sm" style="border-top:1px solid var(--c-border)">
+  <div class="container">
+    <p class="text-center text-muted text-sm mb-3" style="letter-spacing:0.06em;text-transform:uppercase;font-weight:600">Our Partner Couriers</p>
+    <div id="couriers-strip" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ────────────────────────────────────────────────── -->
+<section class="section" style="border-top:1px solid var(--c-border)">
+  <div class="container">
+    <div style="text-align:center;max-width:600px;margin:0 auto">
+      <div style="font-size:3rem;margin-bottom:20px">🚀</div>
+      <h2>Ready to Ship Smarter?</h2>
+      <p style="margin:16px 0 28px">Join thousands of businesses and individuals who use SwiftShip for their international shipping needs.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="contact.html" class="btn btn-primary btn-lg">Get Started Free</a>
+        <a href="rates.html" class="btn btn-secondary btn-lg">View Rates</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer injected by JS -->
+<div id="footer-slot"></div>
+
+<!-- Auth Modal -->
+<script type="module">
+  import { initAuth } from './js/auth.js';
+  import { injectNavbar, injectFooter, injectAuthModal, setupAuthModal, setupNavbarAuth } from './js/components.js';
+  import { getCouriers } from './js/firestore.js';
+  import { showToast, setActiveNav } from './js/ui.js';
+
+  injectNavbar();
+  injectFooter();
+  injectAuthModal();
+  setupNavbarAuth();
+  setupAuthModal();
+  initAuth();
+  setActiveNav();
+
+  // Load couriers into dropdown and strip
+  async function loadCouriers() {
+    try {
+      const couriers = await getCouriers(true); // active only
+      const sel = document.getElementById('courier-select');
+      const strip = document.getElementById('couriers-strip');
+
+      sel.innerHTML = '<option value="">— Choose courier —</option>';
+      strip.innerHTML = '';
+
+      couriers.forEach(c => {
+        sel.innerHTML += `<option value="${c.id}" data-url="${c.tracking_url}">${c.logo || '📦'} ${c.name}</option>`;
+        strip.innerHTML += `
+          <div style="padding:10px 20px;background:var(--c-surface);border:1px solid var(--c-border);border-radius:10px;font-size:0.9rem;font-weight:500;display:flex;align-items:center;gap:8px">
+            <span>${c.logo || '📦'}</span> ${c.name}
+          </div>`;
+      });
+
+      if (!couriers.length) {
+        sel.innerHTML = '<option value="">No active couriers</option>';
+        strip.innerHTML = '<p class="text-muted text-sm">No couriers configured yet.</p>';
+      }
+    } catch (e) {
+      document.getElementById('courier-select').innerHTML = '<option value="">Error loading couriers</option>';
+    }
+  }
+
+  // Track button
+  document.getElementById('track-btn').addEventListener('click', () => {
+    const trackingId = document.getElementById('tracking-id-input').value.trim();
+    const sel = document.getElementById('courier-select');
+    const alertBox = document.getElementById('tracking-alert');
+
+    alertBox.innerHTML = '';
+
+    if (!trackingId) {
+      alertBox.innerHTML = `<div class="alert alert-danger">⚠ Please enter a tracking ID.</div>`;
+      return;
+    }
+    if (!sel.value) {
+      alertBox.innerHTML = `<div class="alert alert-danger">⚠ Please select a courier.</div>`;
+      return;
+    }
+
+    const opt = sel.selectedOptions[0];
+    const url = opt?.dataset?.url;
+    if (!url) { alertBox.innerHTML = `<div class="alert alert-danger">⚠ No tracking URL configured for this courier.</div>`; return; }
+
+    const trackUrl = url.replace('{tracking_id}', encodeURIComponent(trackingId));
+    showToast(`Redirecting to ${opt.text.trim()}...`, 'success');
+    window.open(trackUrl, '_blank', 'noopener,noreferrer');
+  });
+
+  // Enter key tracking
+  document.getElementById('tracking-id-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('track-btn').click();
+  });
+
+  loadCouriers();
+</script>
+</body>
+</html>

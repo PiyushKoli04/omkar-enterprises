@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact & Inquiries — SwiftShip</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈</text></svg>">
+</head>
+<body>
+
+<div id="navbar-slot"></div>
+
+<!-- Page Header -->
+<div style="background:var(--c-surface);border-bottom:1px solid var(--c-border);padding:48px 0">
+  <div class="container">
+    <h1 style="font-size:clamp(1.8rem,4vw,3rem);margin-bottom:10px">Contact Us</h1>
+    <p>Have a question or need a custom quote? We're here to help 24/7.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="contact-grid">
+
+      <!-- Inquiry Form -->
+      <div>
+        <div class="card card-elevated">
+          <h3 style="margin-bottom:6px">📬 Send an Inquiry</h3>
+          <p class="text-sm" style="margin-bottom:24px">Fill out the form below and we'll get back to you within 24 hours.</p>
+
+          <div id="form-alert"></div>
+          <div id="success-message" class="hidden">
+            <div class="alert alert-success" style="margin-bottom:0">
+              ✓ Your inquiry has been submitted! We'll get back to you soon.
+            </div>
+          </div>
+
+          <form id="inquiry-form" style="display:flex;flex-direction:column;gap:16px">
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" class="form-control" id="inq-name" placeholder="John Doe" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="inq-phone" placeholder="+91 9876543210">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address *</label>
+              <input type="email" class="form-control" id="inq-email" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Subject</label>
+              <select class="form-control" id="inq-subject">
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Rate Quote Request">Rate Quote Request</option>
+                <option value="Tracking Issue">Tracking Issue</option>
+                <option value="Customs Assistance">Customs Assistance</option>
+                <option value="Business Partnership">Business Partnership</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Message *</label>
+              <textarea class="form-control" id="inq-message" placeholder="Describe your shipping requirements, route, weight, or any specific questions..." style="min-height:140px" required></textarea>
+            </div>
+            <div id="user-info-notice" class="hidden">
+              <div class="alert alert-info">ℹ Your name and email will be auto-filled from your profile.</div>
+            </div>
+            <button type="submit" class="btn btn-primary" id="inq-submit-btn">
+              Send Inquiry →
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Contact Info -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="contact-info-card">
+          <h3 style="margin-bottom:20px">Contact Information</h3>
+          <div class="contact-info-item">
+            <div class="ci-icon">📍</div>
+            <div>
+              <h4>Headquarters</h4>
+              <p>SwiftShip Logistics Hub<br>Andheri East, Mumbai 400069<br>Maharashtra, India</p>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="ci-icon">📞</div>
+            <div>
+              <h4>Phone Support</h4>
+              <p>+91 22 4000 5000<br>Mon–Sat: 9 AM – 7 PM IST</p>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="ci-icon">📧</div>
+            <div>
+              <h4>Email</h4>
+              <p>support@swiftship.in<br>sales@swiftship.in</p>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="ci-icon">⏰</div>
+            <div>
+              <h4>Response Time</h4>
+              <p>Inquiries answered within 24 hours on business days.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-info-card">
+          <h3 style="margin-bottom:16px">🤝 Partner Couriers</h3>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--c-surface-3);border-radius:8px">
+              <span>🟡</span><span style="font-size:0.9rem;font-weight:500">DHL Express</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--c-surface-3);border-radius:8px">
+              <span>🟣</span><span style="font-size:0.9rem;font-weight:500">FedEx International</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--c-surface-3);border-radius:8px">
+              <span>🟤</span><span style="font-size:0.9rem;font-weight:500">UPS Worldwide</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--c-surface-3);border-radius:8px">
+              <span>🔴</span><span style="font-size:0.9rem;font-weight:500">Aramex</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--c-surface-3);border-radius:8px">
+              <span>🔵</span><span style="font-size:0.9rem;font-weight:500">Blue Dart</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div id="footer-slot"></div>
+
+<script type="module">
+  import { initAuth, getCurrentUser, onUserChange } from './js/auth.js';
+  import { injectNavbar, injectFooter, injectAuthModal, setupAuthModal, setupNavbarAuth } from './js/components.js';
+  import { submitInquiry } from './js/firestore.js';
+  import { showToast, validateFields, setBtnLoading, setActiveNav } from './js/ui.js';
+
+  injectNavbar(); injectFooter(); injectAuthModal();
+  setupNavbarAuth(); setupAuthModal(); initAuth(); setActiveNav();
+
+  // Auto-fill form if user is logged in
+  onUserChange(user => {
+    const notice = document.getElementById('user-info-notice');
+    if (user) {
+      document.getElementById('inq-name').value = user.displayName || '';
+      document.getElementById('inq-email').value = user.email || '';
+      document.getElementById('inq-name').readOnly = true;
+      document.getElementById('inq-email').readOnly = true;
+      notice.classList.remove('hidden');
+    } else {
+      document.getElementById('inq-name').readOnly = false;
+      document.getElementById('inq-email').readOnly = false;
+      notice.classList.add('hidden');
+    }
+  });
+
+  // Form submission
+  document.getElementById('inquiry-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('inq-submit-btn');
+    const alertBox = document.getElementById('form-alert');
+    alertBox.innerHTML = '';
+
+    const name    = document.getElementById('inq-name').value.trim();
+    const email   = document.getElementById('inq-email').value.trim();
+    const phone   = document.getElementById('inq-phone').value.trim();
+    const subject = document.getElementById('inq-subject').value;
+    const message = document.getElementById('inq-message').value.trim();
+
+    if (!validateFields([
+      { value: name,    message: 'Please enter your name.' },
+      { value: email,   message: 'Please enter your email.' },
+      { value: message, message: 'Please enter a message.' }
+    ])) return;
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showToast('Please enter a valid email address.', 'error'); return;
+    }
+
+    setBtnLoading(btn, true);
+
+    try {
+      const user = getCurrentUser();
+      await submitInquiry({
+        name, email, phone, subject, message,
+        uid: user?.uid || null,
+        source: user ? 'authenticated' : 'guest'
+      });
+
+      document.getElementById('inquiry-form').classList.add('hidden');
+      document.getElementById('success-message').classList.remove('hidden');
+      showToast('Inquiry submitted successfully!', 'success');
+    } catch(err) {
+      alertBox.innerHTML = `<div class="alert alert-danger">⚠ Failed to submit. Please try again.</div>`;
+    } finally {
+      setBtnLoading(btn, false, 'Send Inquiry →');
+    }
+  });
+</script>
+</body>
+</html>
